@@ -1,0 +1,67 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+.venv/
+env/
+.env
+*.egg-info/
+.eggs/
+dist/
+build/
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.npm
+
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+.terraform.lock.hcl
+*.tfplan
+
+# SAM
+.aws-sam/
+samconfig.toml
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# LocalStack
+volume/
+.localstack/
+
+# Logs
+*.log
+logs/
+
+# Build artifacts
+*.zip
+*.jar
+target/
+
+# CDK
+cdk.out/
+cdk-outputs.json
+
+# Serverless
+.serverless/
+
+# Credentials (never commit)
+credentials
+.aws/
