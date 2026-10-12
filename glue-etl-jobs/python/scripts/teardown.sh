@@ -3,12 +3,16 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
+# deploy.sh writes .env only after a successful run; fall back to its fixed
+# resource names so a failed deploy can still be cleaned up
 if [ -f "$SCRIPT_DIR/.env" ]; then
     source "$SCRIPT_DIR/.env"
-else
-    echo "No .env file found. Nothing to tear down."
-    exit 0
 fi
+BUCKET="${BUCKET:-glue-pyspark-test}"
+TARGET_BUCKET="${TARGET_BUCKET:-glue-sample-target}"
+JOB_NAME="${JOB_NAME:-test-job1}"
+CLUSTER_IDENTIFIER="${CLUSTER_IDENTIFIER:-glue-etl-cluster1}"
+CONNECTION_NAME="${CONNECTION_NAME:-glue-etl-cluster1-connection}"
 
 echo "Cleaning up Glue ETL resources..."
 

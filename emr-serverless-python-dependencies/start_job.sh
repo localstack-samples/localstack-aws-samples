@@ -44,7 +44,12 @@ job_run_result=$($AWS emr-serverless start-job-run \
 echo $job_run_result
 job_id=$(echo $job_run_result | jq .jobRunId | tr -d '"' )
 
+deadline=$((SECONDS + ${MAX_WAIT_SECONDS:-900}))
 while true; do
+    if [ $SECONDS -ge $deadline ]; then
+        echo "Job '${job_id}' did not finish in time"
+        exit 1
+    fi
     job_run=$($AWS emr-serverless get-job-run --job-run-id $job_id --application-id $application_id)
     state=$(echo $job_run | jq .jobRun.state | tr -d '"' )
     echo "Job '${job_id}', State '${state}'. First run might take a few minutes."

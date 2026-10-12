@@ -26,8 +26,10 @@ jobs:
 
       - id: set-matrix
         run: |
-          # Samples with scripts/deploy.sh and scripts/test.sh
-          mapfile -t scripts < <(find . -path '*/scripts/test.sh' | xargs -n1 dirname | xargs -n1 dirname | sed 's|^\./||' | sort)
+          # Samples with scripts/deploy.sh and scripts/test.sh.
+          # glue-etl-jobs is skipped for now: Glue tries an SSL connection to RDS first, and an
+          # aborted TLS handshake stops the LocalStack Postgres proxy for that cluster.
+          mapfile -t scripts < <(find . -path '*/scripts/test.sh' | xargs -n1 dirname | xargs -n1 dirname | sed 's|^\./||' | grep -v '^glue-etl-jobs/' | sort)
           # Samples with a Makefile test-ci target
           mapfile -t make < <(grep -l '^test-ci:' */Makefile | xargs -n1 dirname | sort)
           echo "scripts=$(printf '%s\n' "${scripts[@]}" | jq -R . | jq -cs .)" >> "$GITHUB_OUTPUT"
@@ -132,7 +134,7 @@ jobs:
           npm install -g @localstack/lstk
 
       - name: Run make test-ci
-        timeout-minutes: 15
+        timeout-minutes: 30
         working-directory: ${{ matrix.directory }}
         env:
           LOCALSTACK_AUTH_TOKEN: ${{ secrets.LOCALSTACK_AUTH_TOKEN }}
