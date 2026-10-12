@@ -15,6 +15,8 @@ build-aws:
 
 deploy:
 	docker compose up --detach
+	@echo Waiting for LocalStack...
+	@for i in $$(seq 1 60); do curl -sf localhost:4566/_localstack/health > /dev/null && break; sleep 2; done
 	terraform workspace select local
 	AWS_ENDPOINT_URL=https://localhost.localstack.cloud:4566 terraform apply --auto-approve
 

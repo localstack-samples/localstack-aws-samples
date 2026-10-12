@@ -1,0 +1,162 @@
+name: Sample Tests
+
+on:
+  push:
+    paths-ignore:
+      - '**.md'
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  schedule:
+    # “At 00:00 on Sunday.”
+    - cron: "0 0 * * 0"
+  workflow_dispatch:
+
+jobs:
+  prepare-list:
+    name: Find testable samples
+    runs-on: ubuntu-latest
+    outputs:
+      scripts: ${{ steps.set-matrix.outputs.scripts }}
+      make: ${{ steps.set-matrix.outputs.make }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - id: set-matrix
+        run: |
+          # Samples with scripts/deploy.sh and scripts/test.sh.
+          # glue-etl-jobs is skipped for now: Glue tries an SSL connection to RDS first, and an
+          # aborted TLS handshake stops the LocalStack Postgres proxy for that cluster.
+          mapfile -t scripts < <(find . -path '*/scripts/test.sh' | xargs -n1 dirname | xargs -n1 dirname | sed 's|^\./||' | grep -v '^glue-etl-jobs/' | sort)
+          # Samples with a Makefile test-ci target
+          mapfile -t make < <(grep -l '^test-ci:' */Makefile | xargs -n1 dirname | sort)
+          echo "scripts=$(printf '%s\n' "${scripts[@]}" | jq -R . | jq -cs .)" >> "$GITHUB_OUTPUT"
+          echo "make=$(printf '%s\n' "${make[@]}" | jq -R . | jq -cs .)" >> "$GITHUB_OUTPUT"
+
+  script-samples:
+    name: Test ${{ matrix.directory }}
+    runs-on: ubuntu-latest
+    needs: prepare-list
+    strategy:
+      fail-fast: false
+      max-parallel: 8
+      matrix:
+        directory: ${{ fromJSON(needs.prepare-list.outputs.scripts) }}
+    env:
+      AWS_ACCESS_KEY_ID: test
+      AWS_SECRET_ACCESS_KEY: test
+      AWS_DEFAULT_REGION: us-east-1
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install tools
+        run: |
+          pip install awscli-local uv
+          npm install -g @localstack/lstk
+          # The runner ships AWS CLI v2, which treats blob parameters as base64 by default
+          aws configure set cli_binary_format raw-in-base64-out
+
+      - name: Start LocalStack
+        env:
+          LOCALSTACK_AUTH_TOKEN: ${{ secrets.LOCALSTACK_AUTH_TOKEN }}
+        run: lstk start
+
+      - name: Deploy
+        timeout-minutes: 15
+        working-directory: ${{ matrix.directory }}
+        run: bash scripts/deploy.sh
+
+      - name: Test
+        timeout-minutes: 10
+        working-directory: ${{ matrix.directory }}
+        run: bash scripts/test.sh
+
+      - name: Show LocalStack logs
+        if: failure()
+        run: lstk logs
+
+      - name: Send a Slack notification
+        if: failure() || github.event_name != 'pull_request'
+        uses: ravsamhq/notify-slack-action@v2
+        with:
+          status: ${{ job.status }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          notification_title: "Sample `${{ matrix.directory }}` ({workflow}) has {status_message}"
+          message_format: "{emoji} *${{ matrix.directory }}* {status_message} in <{repo_url}|{repo}>"
+          footer: "Linked Repo <{repo_url}|{repo}> | <{run_url}|View Workflow run>"
+          notify_when: "failure"
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+  make-samples:
+    name: Test ${{ matrix.directory }}
+    runs-on: ubuntu-latest
+    needs: prepare-list
+    strategy:
+      fail-fast: false
+      max-parallel: 8
+      matrix:
+        directory: ${{ fromJSON(needs.prepare-list.outputs.make) }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: '1.14.9'
+          terraform_wrapper: false
+
+      - name: Install tools
+        run: |
+          pip install localstack awscli-local[ver1] aws-sam-cli-local virtualenv
+          npm install -g @localstack/lstk
+
+      - name: Run make test-ci
+        timeout-minutes: 30
+        working-directory: ${{ matrix.directory }}
+        env:
+          LOCALSTACK_AUTH_TOKEN: ${{ secrets.LOCALSTACK_AUTH_TOKEN }}
+        run: make test-ci
+
+      - name: Upload LocalStack logs
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: logs-${{ matrix.directory }}
+          path: ${{ matrix.directory }}/logs.txt
+          if-no-files-found: ignore
+
+      - name: Send a Slack notification
+        if: failure() || github.event_name != 'pull_request'
+        uses: ravsamhq/notify-slack-action@v2
+        with:
+          status: ${{ job.status }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          notification_title: "Sample `${{ matrix.directory }}` ({workflow}) has {status_message}"
+          message_format: "{emoji} *${{ matrix.directory }}* {status_message} in <{repo_url}|{repo}>"
+          footer: "Linked Repo <{repo_url}|{repo}> | <{run_url}|View Workflow run>"
+          notify_when: "failure"
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}

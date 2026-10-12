@@ -34,11 +34,11 @@ resource "aws_route53_zone" "main" {
 
 # Health check against LocalStack health endpoint
 resource "aws_route53_health_check" "primary" {
-  fqdn              = "localhost.localstack.cloud"
-  port               = 4566
-  resource_path      = "/_localstack/health"
-  type               = "HTTP"
-  request_interval   = 10
+  fqdn             = "localhost.localstack.cloud"
+  port             = 4566
+  resource_path    = "/_localstack/health"
+  type             = "HTTP"
+  request_interval = 10
 }
 
 # Target 1: primary CNAME

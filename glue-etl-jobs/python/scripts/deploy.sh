@@ -20,6 +20,7 @@ echo "Creating RDS Aurora PostgreSQL cluster..."
 awslocal rds create-db-cluster \
     --db-cluster-identifier "$CLUSTER_IDENTIFIER" \
     --engine aurora-postgresql \
+    --enable-http-endpoint \
     --database-name test > /dev/null
 
 echo "Waiting for RDS cluster to be available..."

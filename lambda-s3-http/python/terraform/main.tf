@@ -1,12 +1,12 @@
 # Lambda S3 HTTP Sample - Terraform Configuration
 
 locals {
-  table_name     = "${var.prefix}-game-scores"
-  bucket_name    = "${var.prefix}-replays"
-  queue_name     = "${var.prefix}-score-validation"
-  http_function  = "${var.prefix}-http-handler"
-  s3_function    = "${var.prefix}-s3-handler"
-  sqs_function   = "${var.prefix}-sqs-handler"
+  table_name    = "${var.prefix}-game-scores"
+  bucket_name   = "${var.prefix}-replays"
+  queue_name    = "${var.prefix}-score-validation"
+  http_function = "${var.prefix}-http-handler"
+  s3_function   = "${var.prefix}-s3-handler"
+  sqs_function  = "${var.prefix}-sqs-handler"
 }
 
 # IAM role for Lambda

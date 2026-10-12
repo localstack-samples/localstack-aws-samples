@@ -26,10 +26,11 @@ module.exports.handler = function(event, context, callback) {
   } else {
     // Echo back the event for $default and custom actions
     console.log(`Message received on route: ${routeKey}`);
+    const response = { statusCode: 200, body: JSON.stringify(event) };
     if (callback) {
-      callback(null, event);
+      callback(null, response);
     } else {
-      context.succeed(event);
+      context.succeed(response);
     }
   }
 };

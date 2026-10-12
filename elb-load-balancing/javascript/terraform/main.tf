@@ -19,10 +19,10 @@ provider "aws" {
   skip_requesting_account_id  = true
 
   endpoints {
-    ec2            = var.localstack_endpoint
-    lambda         = var.localstack_endpoint
-    elbv2          = var.localstack_endpoint
-    iam            = var.localstack_endpoint
+    ec2    = var.localstack_endpoint
+    lambda = var.localstack_endpoint
+    elbv2  = var.localstack_endpoint
+    iam    = var.localstack_endpoint
   }
 }
 

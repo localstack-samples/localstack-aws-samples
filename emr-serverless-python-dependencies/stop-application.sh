@@ -1,3 +1,4 @@
+#!/bin/bash
 local="${1:-local}"
 tfoutput=$(terraform output -json)
 application_id=$(echo $tfoutput | jq .application_id.value | tr -d '"')
