@@ -19,10 +19,10 @@ provider "aws" {
   skip_requesting_account_id  = true
 
   endpoints {
-    s3              = "http://localhost.localstack.cloud:4566"
-    rds             = "http://localhost.localstack.cloud:4566"
-    glue            = "http://localhost.localstack.cloud:4566"
-    secretsmanager  = "http://localhost.localstack.cloud:4566"
+    s3             = "http://localhost.localstack.cloud:4566"
+    rds            = "http://localhost.localstack.cloud:4566"
+    glue           = "http://localhost.localstack.cloud:4566"
+    secretsmanager = "http://localhost.localstack.cloud:4566"
   }
 
   s3_use_path_style = true
@@ -58,9 +58,9 @@ resource "aws_s3_object" "job_script" {
 
 # Aurora PostgreSQL cluster
 resource "aws_rds_cluster" "glue_etl" {
-  cluster_identifier = local.cluster_id
-  engine             = "aurora-postgresql"
-  database_name      = "test"
+  cluster_identifier  = local.cluster_id
+  engine              = "aurora-postgresql"
+  database_name       = "test"
   skip_final_snapshot = true
 }
 

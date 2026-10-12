@@ -1,8 +1,8 @@
 # Web App RDS Sample - Terraform Configuration
 
 locals {
-  function_name   = "${var.prefix}-webapp-rds-tf"
-  db_instance_id  = "${var.prefix}-postgres-tf"
+  function_name  = "${var.prefix}-webapp-rds-tf"
+  db_instance_id = "${var.prefix}-postgres-tf"
 }
 
 # Package the Lambda function

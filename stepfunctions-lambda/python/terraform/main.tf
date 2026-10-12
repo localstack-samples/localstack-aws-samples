@@ -132,8 +132,8 @@ resource "aws_sfn_state_machine" "parallel_workflow" {
             StartAt = "Adam"
             States = {
               Adam = {
-                Type     = "Task"
-                Resource = "arn:aws:states:::lambda:invoke"
+                Type       = "Task"
+                Resource   = "arn:aws:states:::lambda:invoke"
                 OutputPath = "$.Payload"
                 Parameters = {
                   FunctionName = aws_lambda_function.adam.arn
@@ -149,8 +149,8 @@ resource "aws_sfn_state_machine" "parallel_workflow" {
             StartAt = "Cole"
             States = {
               Cole = {
-                Type     = "Task"
-                Resource = "arn:aws:states:::lambda:invoke"
+                Type       = "Task"
+                Resource   = "arn:aws:states:::lambda:invoke"
                 OutputPath = "$.Payload"
                 Parameters = {
                   FunctionName = aws_lambda_function.cole.arn
@@ -165,8 +165,8 @@ resource "aws_sfn_state_machine" "parallel_workflow" {
         ]
       }
       Combine = {
-        Type     = "Task"
-        Resource = "arn:aws:states:::lambda:invoke"
+        Type       = "Task"
+        Resource   = "arn:aws:states:::lambda:invoke"
         OutputPath = "$.Payload"
         Parameters = {
           FunctionName = aws_lambda_function.combine.arn

@@ -61,12 +61,12 @@ resource "aws_iam_role" "glue" {
 
 # Redshift cluster
 resource "aws_redshift_cluster" "main" {
-  cluster_identifier = var.redshift_cluster_id
-  database_name      = var.redshift_db_name
-  master_username    = var.redshift_username
-  master_password    = var.redshift_password
-  node_type          = "dc2.large"
-  cluster_type       = "single-node"
+  cluster_identifier  = var.redshift_cluster_id
+  database_name       = var.redshift_db_name
+  master_username     = var.redshift_username
+  master_password     = var.redshift_password
+  node_type           = "dc2.large"
+  cluster_type        = "single-node"
   skip_final_snapshot = true
 }
 
@@ -80,8 +80,8 @@ resource "aws_glue_connection" "redshift" {
   name = "glueconn-tf"
 
   connection_properties = {
-    USERNAME           = var.redshift_username
-    PASSWORD           = var.redshift_password
+    USERNAME            = var.redshift_username
+    PASSWORD            = var.redshift_password
     JDBC_CONNECTION_URL = "jdbc:redshift://${aws_redshift_cluster.main.endpoint}/${var.redshift_db_name}"
   }
 

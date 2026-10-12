@@ -16,10 +16,10 @@ provider "aws" {
   skip_requesting_account_id  = true
 
   endpoints {
-    ec2                = "http://localhost.localstack.cloud:4566"
-    kafka              = "http://localhost.localstack.cloud:4566"
-    glue               = "http://localhost.localstack.cloud:4566"
-    sts                = "http://localhost.localstack.cloud:4566"
+    ec2   = "http://localhost.localstack.cloud:4566"
+    kafka = "http://localhost.localstack.cloud:4566"
+    glue  = "http://localhost.localstack.cloud:4566"
+    sts   = "http://localhost.localstack.cloud:4566"
   }
 }
 

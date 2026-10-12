@@ -19,11 +19,11 @@ provider "aws" {
   skip_requesting_account_id  = true
 
   endpoints {
-    appsync          = "http://localhost.localstack.cloud:4566"
-    dynamodb         = "http://localhost.localstack.cloud:4566"
-    iam              = "http://localhost.localstack.cloud:4566"
-    rds              = "http://localhost.localstack.cloud:4566"
-    secretsmanager   = "http://localhost.localstack.cloud:4566"
+    appsync        = "http://localhost.localstack.cloud:4566"
+    dynamodb       = "http://localhost.localstack.cloud:4566"
+    iam            = "http://localhost.localstack.cloud:4566"
+    rds            = "http://localhost.localstack.cloud:4566"
+    secretsmanager = "http://localhost.localstack.cloud:4566"
   }
 }
 
@@ -61,11 +61,11 @@ resource "aws_dynamodb_table" "posts" {
 
 # RDS Aurora PostgreSQL cluster
 resource "aws_rds_cluster" "main" {
-  cluster_identifier = var.db_cluster_id
-  engine             = "aurora-postgresql"
-  master_username    = var.db_user
-  master_password    = var.db_password
-  database_name      = var.db_name
+  cluster_identifier  = var.db_cluster_id
+  engine              = "aurora-postgresql"
+  master_username     = var.db_user
+  master_password     = var.db_password
+  database_name       = var.db_name
   skip_final_snapshot = true
 }
 
@@ -159,7 +159,7 @@ resource "aws_appsync_datasource" "rds" {
     source_type = "RDS_HTTP_ENDPOINT"
 
     http_endpoint_config {
-      aws_secret_store_arn = aws_secretsmanager_secret.rds.arn
+      aws_secret_store_arn  = aws_secretsmanager_secret.rds.arn
       db_cluster_identifier = aws_rds_cluster.main.arn
       database_name         = var.db_name
       region                = "us-east-1"

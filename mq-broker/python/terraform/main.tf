@@ -35,12 +35,12 @@ locals {
 }
 
 resource "aws_mq_broker" "main" {
-  broker_name        = local.broker_name
-  engine_type        = "ActiveMQ"
-  engine_version     = "5.18"
-  host_instance_type = "mq.m5.large"
-  deployment_mode    = "SINGLE_INSTANCE"
-  publicly_accessible = true
+  broker_name                = local.broker_name
+  engine_type                = "ActiveMQ"
+  engine_version             = "5.18"
+  host_instance_type         = "mq.m5.large"
+  deployment_mode            = "SINGLE_INSTANCE"
+  publicly_accessible        = true
   auto_minor_version_upgrade = true
 
   user {
