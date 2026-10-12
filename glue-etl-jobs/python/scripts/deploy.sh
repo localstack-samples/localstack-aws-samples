@@ -56,7 +56,7 @@ awslocal glue create-table --database legislators \
 awslocal glue create-table --database legislators \
     --table-input '{"Name": "organizations_json", "Parameters": {"connectionName": "'"$CONNECTION_NAME"'"}, "StorageDescriptor": {"Location": "test.organizations"}}'
 awslocal glue create-connection \
-    --connection-input '{"Name": "'"$CONNECTION_NAME"'", "ConnectionType": "JDBC", "ConnectionProperties": {"USERNAME": "test", "PASSWORD": "test", "JDBC_CONNECTION_URL": "jdbc:postgresql://localhost.localstack.cloud:'"$DB_PORT"'"}}'
+    --connection-input '{"Name": "'"$CONNECTION_NAME"'", "ConnectionType": "JDBC", "ConnectionProperties": {"USERNAME": "test", "PASSWORD": "test", "JDBC_CONNECTION_URL": "jdbc:postgresql://localhost.localstack.cloud:'"$DB_PORT"'/test?sslmode=disable"}}'
 
 SECRET_ARN=$(awslocal secretsmanager create-secret --name pass --secret-string "test" | jq -r ".ARN")
 

@@ -63,8 +63,8 @@ resource "aws_iam_role" "invocation_role" {
   "Version": "2012-10-17",
   "Statement": {
     "Effect": "Allow",
-    "Action": "s3:ListBucket",
-    "Resource": "arn:aws:s3:::test-bucket"
+    "Principal": {"Service": "apigateway.amazonaws.com"},
+    "Action": "sts:AssumeRole"
   }
 }
 EOF
@@ -94,20 +94,33 @@ resource "aws_iam_role" "lambda" {
   "Version": "2012-10-17",
   "Statement": {
     "Effect": "Allow",
-    "Action": "s3:ListBucket",
-    "Resource": "arn:aws:s3:::example_bucket"
+    "Principal": {"Service": "lambda.amazonaws.com"},
+    "Action": "sts:AssumeRole"
   }
 }
 EOF
 }
 
+data "archive_file" "lambda" {
+  type        = "zip"
+  output_path = "${path.module}/lambda.zip"
+
+  source {
+    filename = "lambda.py"
+    content  = <<EOF
+def hello(event, context):
+    return {"principalId": "user"}
+EOF
+  }
+}
+
 resource "aws_lambda_function" "authorizer" {
-  filename         = "lambda.zip"
+  filename         = data.archive_file.lambda.output_path
   function_name    = "api_gateway_authorizer"
   role             = aws_iam_role.lambda.arn
   handler          = "lambda.hello"
-  runtime          = "python3.7"
-  source_code_hash = filebase64sha256("lambda.zip")
+  runtime          = "python3.12"
+  source_code_hash = data.archive_file.lambda.output_base64sha256
 }
 
 #resource "aws_elasticsearch_domain" "example" {

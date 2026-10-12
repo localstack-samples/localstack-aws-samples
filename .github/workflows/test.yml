@@ -61,8 +61,10 @@ jobs:
 
       - name: Install tools
         run: |
-          pip install awscli-local
+          pip install awscli-local uv
           npm install -g @localstack/lstk
+          # The runner ships AWS CLI v2, which treats blob parameters as base64 by default
+          aws configure set cli_binary_format raw-in-base64-out
 
       - name: Start LocalStack
         env:
@@ -117,6 +119,12 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: '1.14.9'
+          terraform_wrapper: false
 
       - name: Install tools
         run: |
