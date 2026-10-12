@@ -148,7 +148,7 @@ PYEOF
 
 # Run Python WebSocket test using uv
 # The stage is part of the WebSocket URL, as on AWS
-WS_RESULT=$(uv run --with websockets python -c "$PYTHON_TEST" "$WS_ENDPOINT/$STAGE" 2>&1 || true)
+WS_RESULT=$(uv run -q --with websockets python -c "$PYTHON_TEST" "$WS_ENDPOINT/$STAGE" 2>&1 || true)
 
 case "$WS_RESULT" in
     SUCCESS)
